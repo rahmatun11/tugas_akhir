@@ -211,13 +211,11 @@ class RekapController extends Controller
 
     public function filter(Request $request)
     {
+        dd($request->all());
         $selectedKelas = $request->input('kelas');
 
-        // Lakukan logika filter data berdasarkan kelas yang dipilih
-        // Misalnya:
         $rekapData = Rekap::where('id_kelas', $selectedKelas)->get();
-        echo($rekapData);
-        die();
+        
         $dompdf = new Dompdf();
         // Generate PDF menggunakan Dompdf
         $html = view('rekap.cetakpdf', compact('rekap'));

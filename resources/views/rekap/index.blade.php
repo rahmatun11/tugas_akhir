@@ -198,7 +198,8 @@
 <div class="col-12">
 <div class="card m-b-30 mt-3">
 <div class="card-body">
-    <form method="GET" action="/filter">
+    <form method="POST" action="{{ url('/data-rekap/filter') }}">
+        @csrf
         <div class="form-group row">
             <label for="example-date-input" class="col-sm-2 col-form-label">Tanggal Awal</label>
             <div class="col-md-3">

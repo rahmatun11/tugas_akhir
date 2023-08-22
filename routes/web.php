@@ -107,9 +107,9 @@ Route::get('transaction/{id}/bayar', [PembayaranController::class, 'bayar'])->na
 Route::get('midtrans/callback', [PembayaranController::class, 'callback'])->name('midtrans.callback');
 
 //route rekap tabungan
+Route::post('/data-rekap/filter', [RekapController::class, 'filter'])->name('data-rekap.filter');
 Route::resource('/data-rekap', RekapController::class);
 Route::get('/rekap/show', [RekapController::class,'show'])->name('rekap.show');
-Route::get('/data-rekap/filter', [RekapController::class, 'filter'])->name('data-rekap.filter');
 Route::get('cetakpdfrekap', [RekapController::class, 'cetak_pdf'])->name('cetakpdf');
 
 Route::get('/rekap/generate-pdf', [RekapController::class,'generatePDF'])->name('rekap.generatePDF');
