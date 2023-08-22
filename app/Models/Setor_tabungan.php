@@ -13,13 +13,7 @@ class Setor_tabungan extends Model
 
     protected $primaryKey = 'id_setor_tabungan';
 
-    protected $fillable = [
-        'nisn',
-        'id_tingkat',
-        'id_kelas',
-        'tanggal',
-        'setor',
-    ];
+    protected $guarded = [''];
 
     public function siswa() {
         return $this->belongsTo(Siswa::class, 'nisn');

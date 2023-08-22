@@ -81,8 +81,8 @@ Route::resource('/data-tingkat', TingkatController::class);
 Route::resource('/data-jurusan', JurusanController::class);
 
 Route::resource('/data-sista', Siswa_tahunController::class);
-
 //tabungan setor
+Route::get("/data-setor/post-nisn", [Setor_tabunganController::class, "post_nisn"]);
 Route::resource('/data-setor', Setor_tabunganController::class);
 
 Route::get('cetakpdf', [Setor_tabunganController::class, 'cetak_pdf'])->name('cetakpdf');

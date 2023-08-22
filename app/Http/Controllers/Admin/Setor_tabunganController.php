@@ -44,19 +44,21 @@ class Setor_tabunganController extends Controller
      */
     public function create()
     {   
-        $siswa = Siswa::all();
-        $tingkat = Tingkat::all();
-        $kelas = Kelas::all();
-        $setor_tabungan = Setor_tabungan::get();
-    
-
+        $setor_tabungan = Siswa_tahun::get();
+        
         return view('setor.create',[
-            'siswa' => $siswa,
-            'tingkat' => $tingkat,
-            'kelas' => $kelas,
-            'setor_tabungan' => $setor_tabungan,
+            
+            'tahun' => $setor_tabungan
         ]);
     }
+    // $siswa = Siswa::all();
+    // $tingkat = Tingkat::all();
+    // $kelas = Kelas::all();
+    // $setor_tabungan = Setor_tabungan::get();
+    // 'siswa' => $siswa,
+    // 'tingkat' => $tingkat,
+    // 'kelas' => $kelas,
+    // 'setor_tabungan' => $setor_tabungan,
 
     // public function getTotalSetoran($nisn)
     // {
@@ -87,18 +89,18 @@ class Setor_tabunganController extends Controller
         //dd($request->all());
         $validasi = $request->validate([
             'nisn' => 'required|integer',
-            'tingkat' => 'required|integer',
-            'kelas' => 'required|integer',
+            // 'tingkat' => 'required|integer',
+            // 'kelas' => 'required|integer',
             'tanggal' => 'required',
             // 'saldo' => 'required',
             'setor' => 'required|numeric|max:10000000',    
         ], [
             'nisn.required' => 'Field NISN harus diisi.',
             'nisn.integer' => 'Field NISN harus berupa angka.',
-            'tingkat.required' => 'Field Tingkat harus diisi.',
-            'tingkat.integer' => 'Field Tingkat harus berupa angka.',
-            'kelas.required' => 'Field Kelas harus diisi.',
-            'kelas.integer' => 'Field Kelas harus berupa angka.',
+            // 'tingkat.required' => 'Field Tingkat harus diisi.',
+            // 'tingkat.integer' => 'Field Tingkat harus berupa angka.',
+            // 'kelas.required' => 'Field Kelas harus diisi.',
+            // 'kelas.integer' => 'Field Kelas harus berupa angka.',
             'tanggal.required' => 'Field Tanggal harus diisi.',
             'setor.required' => 'Field Setor harus diisi.',
             'setor.numeric' => 'Field Setor harus berupa angka.',
@@ -108,7 +110,7 @@ class Setor_tabunganController extends Controller
         if($validasi) :
             $store = Setor_tabungan::create([
                 'nisn' => $validasi['nisn'],
-                'id_tingkat' => $validasi['tingkat'],
+                'id_tingkat' => $request->tingkat,
                 'id_kelas' => $request->kelas,
                 'tanggal' => $validasi['tanggal'],
                 // 'saldo' => $validasi['saldo'],
@@ -177,7 +179,6 @@ class Setor_tabunganController extends Controller
      */
     public function update(Request $request, $id_setor_tabungan)
     {
-        // dd($request->all());
         $validasi = $request->validate([
             'nisn' => 'required|integer',
             'tingkat' => 'required|integer',
@@ -244,6 +245,14 @@ class Setor_tabunganController extends Controller
 
         // Mengirimkan hasil PDF sebagai respons file download
         return $dompdf->stream($filename);
+    }
+
+    public function post_nisn(Request $request)
+    {
+        $tahun_siswa = Siswa_tahun::where("nisn", $request->selected)
+            ->first();
+
+        return response()->json(["tingkat" => $tahun_siswa->tingkat, "kelas" => $tahun_siswa->kelas]);
     }
     // public function cetak_pdf()
     // {

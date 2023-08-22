@@ -158,7 +158,8 @@
                     </div>
                 </form> --}}
                 
-                <form action="{{ url('data-rekap') }}" method="get">
+                <form action="{{ url('data-rekap/filter') }}" method="POST">
+                    @method('POST')
                     @csrf
                     <div class="form-group">
                         <label for="kelas">Pilih Kelas:</label>
@@ -195,7 +196,7 @@
 </div>
 <div class="row">
 <div class="col-12">
-<div class="card m-b-30">
+<div class="card m-b-30 mt-3">
 <div class="card-body">
     <form method="GET" action="/filter">
         <div class="form-group row">
@@ -238,20 +239,22 @@
                 <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>
-                            {{ $item->Setor_tabungan ?? 'Data kosong' }}
+                            {{ $item->Setor_tabungan->siswa->nama ?? 'Data kosong' }}
                         </td>
                         <td>
-                            {{ $item->kelas->nama_kelas ?? 'Data kosong' }}
+                            {{ $item->Setor_tabungan->kelas->nama_kelas ?? 'Data kosong' }}
                         </td>
                         <td>
                             <div class="form-group">
-                                <input type="text" class="form-control saldo-tabungan" value="{{ 'Rp ' . number_format($total,0, ',', '.') }}" readonly>
+                                <input type="text" class="form-control saldo-tabungan" value="{{ 'Rp ' . number_format($item->Setor_tabungan->setor,0, ',', '.') }}" readonly>
                                 <br>
                             </div>
                         </td>
                         <td>
-                            <a href="{{ route('rekap.show', ['nisn'=>$item->siswa->nisn]) }}" class="btn btn-warning">Lihat</a>
-                            </td>                   
+                            <a href="{{ url('data-rekap/' . $item->id) }}" class="btn btn-warning">Lihat</a>
+                        
+                        </td> 
+
 
                     </tr>
                 @empty

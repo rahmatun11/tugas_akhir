@@ -35,7 +35,7 @@
 <div class="col-lg-13">
 <div class="card m-b-30">
 <div class="card-body">
-<h4 class="mt-0 header-title">Unduh rekap laporan tabungan pertanggal</h4>
+<h4 class="mt-0 header-title"></h4>
         <div class="card m-b-30">
             <div class="card-body mb-3">
                 <h4 class="mt-0 header-title mb-3">Unduh laporan tabungan pertanggal</h4>
@@ -143,12 +143,12 @@
                            $tarik = $item->tarik_tabungan['tarik'] ?? 0;
                            $total = $tabungan - $tarik;
                         @endphp
-                        {{-- <td>
+                        <td>
                             <div class="form-group">
                                 <input type="text" class="form-control saldo-tabungan" value="{{ 'Rp ' . number_format($total,0, ',', '.') }}" readonly>
                                 <br>
                             </div>
-                        </td> --}}
+                        </td>
                         
 
                     </tr>

@@ -36,12 +36,12 @@ class Siswa_tahunController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {   
+    {
         $siswa = Siswa::all();
         $tingkat = Tingkat::all();
         $kelas = Kelas::all();
         $tahun_ajaran = Tahun_ajaran::all();
-        return view('siswatahun.create',[
+        return view('siswatahun.create', [
             'siswa' => $siswa,
             'tingkat' => $tingkat,
             'kelas' => $kelas,
@@ -57,7 +57,6 @@ class Siswa_tahunController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         $validasi = $request->validate([
             'nisn' => 'required|integer',
             'tingkat' => 'required|integer',
@@ -65,22 +64,28 @@ class Siswa_tahunController extends Controller
             'tahun_ajaran' => 'required|integer',
         ]);
 
-        if($validasi) :
-            $store = Siswa_tahun::create([
-                'nisn' => $validasi['nisn'],
-                'id_tingkat' => $validasi['tingkat'],
-                'id_kelas' => $request->kelas,
-                'id_tahun_ajaran' => $request->tahun_ajaran,  
-            ]);
-            if($store) :
-                alert()->success('Berhasil','Data Tahun Siswa Berhasil di Tambahkan');
-            else :
-                alert()->error('Error','Silahkan Periksa Data Kelengkapan Anda');
-            endif;
-        endif;
-        return redirect()->route('data-sista.index');
+        $existingSiswa = Siswa_tahun::where('nisn', $validasi['nisn'])->first();
+        if ($existingSiswa) {
+            alert()->error('Error', 'NISN sudah ada di database');
+            return redirect()->route('data-sista.index');
+        }
 
+        $store = Siswa_tahun::create([
+            'nisn' => $validasi['nisn'],
+            'id_tingkat' => $validasi['tingkat'],
+            'id_kelas' => $request->kelas,
+            'id_tahun_ajaran' => $request->tahun_ajaran,
+        ]);
+
+        if ($store) {
+            alert()->success('Berhasil', 'Data Tahun Siswa Berhasil di Tambahkan');
+        } else {
+            alert()->error('Error', 'Silahkan Periksa Data Kelengkapan Anda');
+        }
+
+        return redirect()->route('data-sista.index');
     }
+
 
     /**
      * Display the specified resource.
@@ -107,7 +112,7 @@ class Siswa_tahunController extends Controller
         $tahun_ajaran = Tahun_ajaran::all();
         $siswa_tahun = Siswa_tahun::findOrFail($id_siswa_tahun);
         // dd($user);
-        return view('siswatahun.edit',compact('siswa','tingkat','kelas','tahun_ajaran','siswa_tahun'));
+        return view('siswatahun.edit', compact('siswa', 'tingkat', 'kelas', 'tahun_ajaran', 'siswa_tahun'));
     }
 
     /**
@@ -127,12 +132,12 @@ class Siswa_tahunController extends Controller
             'tahun_ajaran' => 'required|integer',
         ]);
 
-        if($validasi) :
+        if ($validasi) :
             $update = Siswa_tahun::findOrFail($id_siswa_tahun)->update($validasi);
-            if($update) :
-                alert()->success('Berhasil','Data Tahun Siswa Berhasil di Ubah');
+            if ($update) :
+                alert()->success('Berhasil', 'Data Tahun Siswa Berhasil di Ubah');
             else :
-                alert()->error('Error','Silahkan Periksa Data Kelengkapan Anda');
+                alert()->error('Error', 'Silahkan Periksa Data Kelengkapan Anda');
             endif;
         endif;
 
@@ -147,9 +152,9 @@ class Siswa_tahunController extends Controller
      */
     public function destroy($id_siswa_tahun)
     {
-        if(Siswa_tahun::find($id_siswa_tahun)->delete()):
+        if (Siswa_tahun::find($id_siswa_tahun)->delete()) :
             Alert::success('Berhasil', 'Data Berhasil di Hapus');
-        else:
+        else :
             Alert::error('Terjadi Kesalahan', 'Data Gagal di Hapus');
         endif;
 

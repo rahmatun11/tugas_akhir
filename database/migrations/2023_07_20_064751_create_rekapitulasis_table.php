@@ -17,7 +17,7 @@ class CreateRekapitulasisTable extends Migration
             $table->id();
 
             $table->unsignedBigInteger('nisn');
-            $table->foreign('nisn')->references('nisn')->on('siswa')->onDelete('cascade')->onUpdate('cascade');
+            // $table->foreign('nisn')->references('nisn')->on('siswa')->onDelete('cascade')->onUpdate('cascade');
             
             $table->unsignedBigInteger('id_buku');
             $table->foreign('id_buku')->references('id_buku')->on('buku')->onDelete('cascade')->onUpdate('cascade');
@@ -29,10 +29,10 @@ class CreateRekapitulasisTable extends Migration
             $table->foreign('id_kasur_lemari')->references('id_kasur_lemari')->on('kasur_lemari')->onDelete('cascade')->onUpdate('cascade');
 
             $table->unsignedBigInteger('id_kegiatan_pertahun');
-            $table->foreign('id_kegiatan_pertahun')->references('id_kegiatan_pertahun')->on('kegiatan_pertahun')->onDelete('cascade')->onUpdate('cascade');
+            // $table->foreign('id_kegiatan_pertahun')->references('id_kegiatan_pertahun')->on('kegiatan_pertahun')->onDelete('cascade')->onUpdate('cascade');
 
             $table->unsignedBigInteger('id_tanah_bangunan');
-            $table->foreign('id_tanah_bangunan')->references('id_tanah_bangunan')->on('tanah_bangunan ')->onDelete('cascade')->onUpdate('cascade');
+            // $table->foreign('id_tanah_bangunan')->references('id_tanah_bangunan')->on('tanah_bangunan ')->onDelete('cascade')->onUpdate('cascade');
 
             $table->unsignedBigInteger('jumlah_bayar');
             $table->timestamps();

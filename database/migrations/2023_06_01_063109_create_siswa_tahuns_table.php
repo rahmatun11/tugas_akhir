@@ -18,7 +18,6 @@ class CreateSiswaTahunsTable extends Migration
                
                 $table->char('nisn', 15);
                 $table->foreign('nisn')->references('nisn')->on('siswa')->onDelete('cascade')->onUpdate('cascade');
-                
 
                 $table->unsignedBigInteger('id_tingkat');
                 $table->foreign('id_tingkat')->references('id_tingkat')->on('tingkat')->onDelete('cascade')->onUpdate('cascade');

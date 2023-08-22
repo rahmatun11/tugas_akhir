@@ -35,7 +35,7 @@
                                                 @if(count($tingkat)==0)
                                                 <option value="">Pilihan tidak ada</option>
                                                 @else
-                                                <option value="">Silahkan pilih</option>
+                                                {{-- <option value="">Silahkan pilih</option> --}}
                                                 @foreach($tingkat as $ti)
                                                 <option value="{{ $ti->id_tingkat }}" {{ $setor_tabungan->siswa->tingkat_id == $ti->id_tingkat ? 'selected' : '' }}>
                                                     {{ $ti->tingkat }}
@@ -52,7 +52,7 @@
                                                 @if(count($kelas)==0)
                                                 <option value="">Pilihan tidak ada</option>
                                                 @else
-                                                <option value="">Silahkan pilih</option>
+                                                {{-- <option value="">Silahkan pilih</option> --}}
                                                 @foreach($kelas as $kls)
                                                 <option value="{{ $kls->id_kelas }}" {{ $setor_tabungan->siswa->kelas_id == $kls->id_kelas ? 'selected' : '' }}>
                                                     {{ $kls->nama_kelas }}
@@ -77,7 +77,7 @@
 
                                         <div class="form-group">
                                             <label for="">SETOR</label>
-                                            <input type="text" name="setor" class="form-control" value="{{ $setor_tabungan->setor }}" required>
+                                            <input type="text" name="setor" class="form-control" value="" required>
                                             <br>
                                         </div>
 
