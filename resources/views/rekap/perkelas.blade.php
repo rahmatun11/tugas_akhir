@@ -122,14 +122,14 @@
             <div class="card-body">
                 <h4 class="mt-0 header-title mb-3">Unduh laporan tabungan perkelas</h4>
                 <h4 class="mt-0 header-title mb-3">Filter Kelas:</h4>
-                <form class="form" method="get" action="{{ route('search') }}">
+                <form class="form" method="get" action="">
                     <div class="form-group w-100 mb-3">
                         <label for="search" class="d-block mr-2">Pencarian</label>
                         <select name="kelas" id="kelas" class="form-control">
                             <option value="">Pilih Kelas</option>
-                            @foreach ($Kelas as $kls)
+                            {{-- @foreach ($Kelas as $kls)
                                 <option value="{{ $kls->id_kelas }}">{{ $kls->nama_kelas }}</option>
-                            @endforeach
+                            @endforeach --}}
                         </select>
                         <button type="submit" class="btn btn-primary mb-1">Cari</button>
                     </div>
@@ -197,11 +197,12 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($Kelas as $item)
+                {{$rekap}}
+                @foreach ($rekap as $item)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>
-                            {{ $item->siswa->nama ?? 'Data kosong' }}
+                            {{ $item->siswa ?? 'Data kosong' }}
                         </td>
                         <td>
                             {{ $item->nama_kelas ?? 'Data kosong' }}

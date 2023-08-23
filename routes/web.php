@@ -111,7 +111,7 @@ Route::post('/data-rekap/filter', [RekapController::class, 'filter'])->name('dat
 Route::resource('/data-rekap', RekapController::class);
 Route::get('/rekap/show', [RekapController::class,'show'])->name('rekap.show');
 Route::get('cetakpdfrekap', [RekapController::class, 'cetak_pdf'])->name('cetakpdf');
-
+Route::post('/rekap_kelas', [RekapController::class, 'filter_kelas']);
 Route::get('/rekap/generate-pdf', [RekapController::class,'generatePDF'])->name('rekap.generatePDF');
 
 // Route::post('cetakpdfkelas', [RekapController::class, 'downloadPdfPerKelas'])->name('cetakpdfkelas');

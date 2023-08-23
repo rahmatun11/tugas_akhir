@@ -13,41 +13,18 @@ use App\Models\Setor_tabungan;
 
 use App\Models\Tarik_tabungan;
 use App\Http\Controllers\Controller;
+use App\Models\Siswa;
+use App\Models\Siswa_tahun;
 use illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\View;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class RekapController extends Controller
 {
-    // public function index()
-    // {
-    //     $class = Kelas::all();
-    //     $rekapData = Rekap::select('nisn','id_kelas')->orderBy('created_at', 'desc')->distinct()->get();
-    //     $total = 0;
-    //     foreach($rekapData as $d) {
-    //         $tarik = Tarik_tabungan::where('nisn',$d['nisn'])->sum('tarik');
-    //         $setor = Setor_tabungan::where('nisn',$d['nisn'])->sum('setor');
-    //         $total = $setor - $tarik;
-    //     }
-    //     $totalTarik = Tarik_tabungan::sum('tarik');
-    //     $totalSetor = Setor_tabungan::sum('setor');
-    //     $totalKeseluruhan = $totalSetor - $totalTarik;
-    //     $data = [
-    //         'rekap' => $rekapData,
-    //         'total_keseluruhan' => $totalKeseluruhan,
-    //         'total_setor' => $totalSetor,
-    //         'total_tarik' => $totalTarik,
-    //         'total'=>$total,
-    //         'Kelas' => $class
-    //     ]; 
-
-    //     return view('rekap.index', $data);
-    // }
-
     public function index(Request $request)
     {
         $class = Kelas::all();
-        $selectedKelasId = $request->input('kelas'); 
+        $selectedKelasId = $request->input('kelas');
 
         $rekapData = Rekap::select()
             ->when($selectedKelasId, function ($query) use ($selectedKelasId) {
@@ -69,6 +46,7 @@ class RekapController extends Controller
         $totalKeseluruhan = $totalSetor - $totalTarik;
 
         $data = [
+            "siswa" => Siswa_tahun::get(),
             'rekap' => $rekapData,
             'total_keseluruhan' => $totalKeseluruhan,
             'total_setor' => $totalSetor,
@@ -93,7 +71,7 @@ class RekapController extends Controller
             ->orderBy('created_at', 'desc');
 
         $rekapData = $rekapQuery->get();
-        
+
         $total = 0;
         foreach ($rekapData as $d) {
             $tarik = Tarik_tabungan::where('nisn', $d['nisn'])->sum('tarik');
@@ -206,7 +184,27 @@ class RekapController extends Controller
     // }
 
 
+    public function filter_kelas(Request $request)
+    {
+        $total_setor = Setor_tabungan::where("id_kelas", $request->kelas)
+            ->sum("setor");
+            
+        $tarik = Tarik_tabungan::where("id_kelas", $request->kelas)
+            ->sum("tarik");
 
+        $data = [
+            "rekap" => Siswa_tahun::whereHas("kelas", function($query) use ($request) {
+                $query->where("id_kelas", $request->kelas);
+            })->get(),
+            "total_tarik" => $tarik,
+            "total_setor" => $total_setor,
+            "total_keseluruhan" => $total_setor - $tarik,
+            "Kelas" => Kelas::all(),
+            "selectedKelasId" => $request->input('kelas')
+        ];
+
+        return back()->with(["data" => $data]);
+    }
 
 
     public function filter(Request $request)
@@ -215,7 +213,7 @@ class RekapController extends Controller
         $selectedKelas = $request->input('kelas');
 
         $rekapData = Rekap::where('id_kelas', $selectedKelas)->get();
-        
+
         $dompdf = new Dompdf();
         // Generate PDF menggunakan Dompdf
         $html = view('rekap.cetakpdf', compact('rekap'));
