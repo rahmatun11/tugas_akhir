@@ -175,7 +175,7 @@
                                                             {{ $kelas->nama_kelas }}
                                                         </option>
                                                         @else
-                                                        <option value="{{ $kelas->id_kelas }}" selected>
+                                                        <option value="{{ $kelas->id_kelas }}" {{ session("data") }} >
                                                             {{ $kelas->nama_kelas }}
                                                         </option>
                                                         @endif
