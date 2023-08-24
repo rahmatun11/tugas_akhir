@@ -111,89 +111,37 @@ class RekapController extends Controller
 
 
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $rekapData = Rekap::where('id', $id)->orderBy('created_at', 'desc')->get();
+        $rekap = Rekap::where("nisn", $id)->get();
 
-        $data = ['rekap' => $rekapData];
+        $totalSetor = $rekap->sum(function ($item) {
+            if (!empty($totalSetor)) {
+                return $item->Setor_tabungan->setor;
+            } else {
+            }
+        });
 
-        return view('rekap.show', $data);
+        dd($totalSetor);
+        $totalTarik = $rekap->sum(function ($item) {
+            if (!empty($rekap)) {
+                return $item->Tarik_tabungan->tarik;
+            } else {
+            }
+        });
+
+        return view('rekap.show', compact('rekap', 'totalSetor', 'totalTarik'));
     }
-    // public function getSaldoTabunganhasil(Request $request)
-    // {
-    //     $nisn = $request->nisn;
-
-    //     // Query untuk mendapatkan saldo tabungan berdasarkan NISN
-    //     $saldo = Setor_tabungan::where('nisn', $nisn)->sum('setor') - Tarik_tabungan::where('nisn', $nisn)->sum('tarik');
-
-    //     return response()->json(['rekap.index' => $saldo]);
-    // }
-    //     public function cetak_pertanggalrekap($tglwal, $tglakhir)
-    // {
-    //     // Total pemasukan sebelum tanggal awal
-    //     $total_setorSebelum = Setor_tabungan::where('created_at', '<', $tglwal)
-    //         ->sum('setor');
-
-    //     // Total pemasukan dalam rentang tanggal yang diberikan
-    //     $total_setor = Setor_tabungan::whereBetween('tanggal', [$tglwal, $tglakhir])
-    //         ->sum('setor');
-
-    //     $setor = Setor_tabungan::whereBetween('created_at', [$tglwal, $tglakhir])->get();
-
-    //     $total_tarikSebelum = Tarik_tabungan::where('created_at', '<', $tglwal)
-    //         ->sum('tarik');
-
-    //     // Total pemasukan dalam rentang tanggal yang diberikan
-    //     $total_tarik = Tarik_tabungan::whereBetween('tanggal', [$tglwal, $tglakhir])
-    //         ->sum('tarik');
-
-    //     $tarik = Tarik_tabungan::whereBetween('created_at', [$tglwal, $tglakhir])->get();
-
-
-    //     $rekap = Rekap::whereBetween('tanggal', [$tglwal, $tglakhir])->get();
-
-    //     //  $total_keseluruhan = $total_setor + $total_tarik; 
-
-    //     // Buat objek Dompdf
-    //     $dompdf = new Dompdf();
-
-    //     // Load view PDF dan berikan data yang diperlukan
-    //    // Load view PDF and provide the necessary data
-    //     $html = view('rekap.cetakpdf', compact('setor', 'tarik', 'total_setor', 'total_tarik', 'tglwal', 'tglakhir', 'rekap'));
-
-
-    //     // Konversi view HTML menjadi PDF
-    //     $dompdf->loadHtml($html);
-    //     $dompdf->setPaper('A4', 'portrait');
-    //     $dompdf->render();
-
-    //     // Generate nama file PDF
-    //     $filename = 'laporan_tabungan_pertanggal' . '.pdf';
-
-    //     // Mengirimkan hasil PDF sebagai respons file download
-    //     return $dompdf->stream($filename);
-    // }
-    // public function cetakPeriodRekap(Request $request)
-    // {
-    //     // Get the input from the form
-    //     $tglwal = $request->input('tglawal');
-    //     $tglakhir = $request->input('tglakhir');
-
-    //     // Call the existing cetak_pertanggalrekap method to generate the PDF
-    //     return $this->cetak_pertanggalrekap($tglwal, $tglakhir);
-    // }
-
-
     public function filter_kelas(Request $request)
     {
         $total_setor = Setor_tabungan::where("id_kelas", $request->kelas)
             ->sum("setor");
-            
+
         $tarik = Tarik_tabungan::where("id_kelas", $request->kelas)
             ->sum("tarik");
 
         $data = [
-            "rekap" => Siswa_tahun::whereHas("kelas", function($query) use ($request) {
+            "rekap" => Siswa_tahun::whereHas("kelas", function ($query) use ($request) {
                 $query->where("id_kelas", $request->kelas);
             })->get(),
             "total_tarik" => $tarik,
@@ -204,6 +152,39 @@ class RekapController extends Controller
         ];
 
         return back()->with(["data" => $data]);
+    }
+
+    public function download_perkelas($kelas)
+    {
+        $total_setor = Setor_tabungan::where("id_kelas", $kelas)
+            ->sum("setor");
+
+        $tarik = Tarik_tabungan::where("id_kelas", $kelas)
+            ->sum("tarik");
+
+        $data = [
+            "rekap" => Siswa_tahun::whereHas("kelas", function ($query) use ($kelas) {
+                $query->where("id_kelas", $kelas);
+            })->get(),
+            "total_tarik" => $tarik,
+            "total_setor" => $total_setor,
+            "total_keseluruhan" => $total_setor - $tarik,
+            "Kelas" => Kelas::all(),
+        ];
+
+        $dompdf = new Dompdf();
+        // Generate PDF menggunakan Dompdf
+        $html = view('rekap.cetakpdf', ["data" => $data]);
+
+        // Konversi view HTML menjadi PDF
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $filename = 'laporan_kelas' . '.pdf';
+
+        // Mengirimkan hasil PDF sebagai respons file download
+        return $dompdf->stream($filename);
     }
 
 
@@ -278,29 +259,4 @@ class RekapController extends Controller
         // Mengirimkan hasil PDF sebagai respons file download
         return $dompdf->stream($filename);
     }
-    // public function downloadPdfPerKelas(Request $request)
-    //     {
-    //         $kelas = $request->input('kelas'); // Mengambil kelas dari input form
-
-    //         $rekapData = Rekap::where('kelas', $kelas)->orderBy('created_at', 'desc')->get();
-
-    //         $data = [
-    //             'rekap' => $rekapData,
-    //             'kelas' => $kelas,
-    //         ];
-
-    //         $dompdf = new Dompdf();
-
-    //         // Load view PDF dan berikan data yang diperlukan
-    //         $html = view('rekap.pdf', $data); // Menggunakan variabel $data
-
-    //         // Konversi view HTML menjadi PDF
-    //         $dompdf->loadHtml($html);
-    //         $dompdf->setPaper('A4', 'portrait');
-    //         $dompdf->render();
-    //         $filename = "rekap_tabungan_{$kelas}.pdf";
-
-    //         return $dompdf->stream($filename);
-    //     }
-
 }

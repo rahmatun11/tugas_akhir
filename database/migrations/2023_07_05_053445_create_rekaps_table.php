@@ -15,6 +15,7 @@ class CreateRekapsTable extends Migration
     {
         Schema::create('rekap', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('nisn')->nullable();
             $table->foreignId('id_setor_tabungan')->nullable();
             $table->foreignId('id_tarik_tabungan')->nullable();
             $table->timestamps();

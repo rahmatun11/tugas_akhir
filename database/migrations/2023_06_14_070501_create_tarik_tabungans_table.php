@@ -16,7 +16,7 @@ class CreateTarikTabungansTable extends Migration
         Schema::create('tarik_tabungan', function (Blueprint $table) {
             $table->id('id_tarik_tabungan');
             $table->char('nisn', 15);
-            $table->foreign('nisn')->references('nisn')->on('siswa')->onDelete('cascade')->onUpdate('cascade');
+            // $table->foreign('nisn')->references('nisn')->on('siswa')->onDelete('cascade')->onUpdate('cascade');
             
 
             $table->unsignedBigInteger('id_tingkat');

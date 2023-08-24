@@ -83,6 +83,7 @@ Route::resource('/data-jurusan', JurusanController::class);
 Route::resource('/data-sista', Siswa_tahunController::class);
 //tabungan setor
 Route::get("/data-setor/post-nisn", [Setor_tabunganController::class, "post_nisn"]);
+Route::get('/download_rekap_perkelas/{kelas}', [RekapController::class, 'download_perkelas'])->name('download.filter.kelas');
 Route::resource('/data-setor', Setor_tabunganController::class);
 
 Route::get('cetakpdf', [Setor_tabunganController::class, 'cetak_pdf'])->name('cetakpdf');
@@ -109,7 +110,7 @@ Route::get('midtrans/callback', [PembayaranController::class, 'callback'])->name
 //route rekap tabungan
 Route::post('/data-rekap/filter', [RekapController::class, 'filter'])->name('data-rekap.filter');
 Route::resource('/data-rekap', RekapController::class);
-Route::get('/rekap/show', [RekapController::class,'show'])->name('rekap.show');
+Route::get('/rekap/show/{id}', [RekapController::class,'show'])->name('rekap.show');
 Route::get('cetakpdfrekap', [RekapController::class, 'cetak_pdf'])->name('cetakpdf');
 Route::post('/rekap_kelas', [RekapController::class, 'filter_kelas']);
 Route::get('/rekap/generate-pdf', [RekapController::class,'generatePDF'])->name('rekap.generatePDF');
