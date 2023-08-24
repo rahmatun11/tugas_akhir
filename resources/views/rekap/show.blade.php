@@ -8,33 +8,6 @@
 
     <div class="container-xxl flex-grow-1 container-p-y">
         <div class="row">
-            <div class="col-lg-12 mb-4 order-0">
-                <div class="card">
-                    <div class="container-xxl flex-grow-1 container-p-y">
-                        <h4 class="mt-0 header-title">Data Rekap Tabungan Siswa</h4>
-                        <div class="">
-                            <div class="alert alert-success text-light "
-                                style="background: linear-gradient(to top, #47acff,#1870d4);" role="alert">
-
-                                <i class=" mdi mdi-information-outline"></i><span style="color:white;font-weight:bold;">
-                                    Rekap Tabungan Siswa
-                                </span>
-                                <h6 class="mt-3 text-light">
-                                    {{-- Setor : {{ 'Rp ' . number_format($rekap, 0, ',', '.') }}. --}}
-                                   {{$totalSetor}}
-                                </h6>
-                                <h6>
-                                    {{-- tarik : {{ 'Rp ' . number_format($total_tarik, 0, ',', '.') }} --}}
-                                </h6>
-                                <hr>
-                                <h2>
-                                    {{-- {{ 'Rp ' . number_format($total_keseluruhan, 0, ',', '.') }} --}}
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="col-lg-13">
                 <div class="card m-b-30">
                     <div class="card-body">
@@ -42,11 +15,9 @@
                         <div class="card m-b-30">
                             <div class="card-body mb-3">
                                 <h4 class="mt-0 header-title mb-3">Unduh laporan tabungan pertanggal</h4>
-
-                                <!-- Form for date input -->
                                 <form action="{{ route('cetak-pertanggal-rekap') }}" method="POST">
                                     @csrf
-                                    <div class="form-group row">
+                                    <div class="form-group row mb-4">
                                         <label for="tglawal" class="col-sm-2 col-form-label">Tanggal Awal</label>
                                         <div class="col-sm-10">
                                             <input class="form-control" type="date" name="tglawal" id="tglawal">
@@ -70,8 +41,8 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12">
+            <div class="row mt-4">
+                <div class="col-13">
                     <div class="card m-b-30">
                         <div class="card-body">
                             <form method="GET" action="/filter">
@@ -110,7 +81,6 @@
                                                     @elseif(!empty($item->Tarik_tabungan))
                                                         Rp. {{ number_format($item->Tarik_tabungan->tarik) }}
                                                     @endif
-                                                    {{-- {{ 'Rp ' . number_format($item->setor ?? 0, 0, ',', '.') }} --}}
                                                 </td>
                                                 <td>
                                                     @if (!empty($item->Setor_tabungan))
@@ -122,23 +92,12 @@
                                                 <td>
                                                     {{ Carbon::parse($item->created_at)->locale('id')->isoFormat('dddd, D MMMM YYYY HH:mm:ss') }}
                                                 </td>
-                                                @php
-                                                    // $tabungan = $item->setor_tabungan['setor'] ?? 0;
-                                                    // $tarik = $item->tarik_tabungan['tarik'] ?? 0;
-                                                    // $total = $tabungan - $tarik;
-                                                @endphp
-                                                <td>
-                                                    <div class="form-group">
-                                                        {{-- <input type="text" class="form-control saldo-tabungan" value="{{ 'Rp ' . number_format($total,0, ',', '.') }}" readonly> --}}
-                                                        <br>
-                                                    </div>
-                                                </td>
-
-
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
                             @endsection
 
                             @push('addon-script')

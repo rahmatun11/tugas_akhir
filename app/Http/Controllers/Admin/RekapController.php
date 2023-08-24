@@ -122,7 +122,6 @@ class RekapController extends Controller
             }
         });
 
-        dd($totalSetor);
         $totalTarik = $rekap->sum(function ($item) {
             if (!empty($rekap)) {
                 return $item->Tarik_tabungan->tarik;
