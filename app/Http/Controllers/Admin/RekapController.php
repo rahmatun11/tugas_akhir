@@ -153,7 +153,7 @@ class RekapController extends Controller
         return back()->with(["data" => $data]);
     }
 
-    public function download_perkelas($kelas)
+    public function download_perkelas(Request $request, $kelas)
     {
         $total_setor = Setor_tabungan::where("id_kelas", $kelas)
             ->sum("setor");
@@ -169,44 +169,29 @@ class RekapController extends Controller
             "total_setor" => $total_setor,
             "total_keseluruhan" => $total_setor - $tarik,
             "Kelas" => Kelas::all(),
+            "selectedKelasId" => $kelas
         ];
 
-        $dompdf = new Dompdf();
-        // Generate PDF menggunakan Dompdf
-        $html = view('rekap.cetakpdf', ["data" => $data]);
+        return view('rekap.cetakpdf', ["data" => $data]);
 
-        // Konversi view HTML menjadi PDF
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
+        // $dompdf = new Dompdf();
+        // $html = view('rekap.cetakpdf', ["data" => $data]);
 
-        $filename = 'laporan_kelas' . '.pdf';
+        // $dompdf->loadHtml($html);
+        // $dompdf->setPaper('A4', 'portrait');
+        // $dompdf->render();
 
-        // Mengirimkan hasil PDF sebagai respons file download
-        return $dompdf->stream($filename);
+        // $filename = 'laporan_kelas' . '.pdf';
+
+        // return $dompdf->stream($filename);
     }
 
 
-    public function filter(Request $request)
+    public function rekap_pertanggal(Request $request)
     {
-        dd($request->all());
-        $selectedKelas = $request->input('kelas');
-
-        $rekapData = Rekap::where('id_kelas', $selectedKelas)->get();
-
-        $dompdf = new Dompdf();
-        // Generate PDF menggunakan Dompdf
-        $html = view('rekap.cetakpdf', compact('rekap'));
-
-        // Konversi view HTML menjadi PDF
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
-
-        $filename = 'laporan_tabungan_perkelas' . '.pdf';
-
-        // Mengirimkan hasil PDF sebagai respons file download
-        return $dompdf->stream($filename);
+        $tanggal_awal = $request->input('tglawal');
+        $tanggal_akhir = $request->input('tglakhir');
+        dd($request->tglawal);
     }
 
     public function cetak_pertanggalrekap(Request $request)
@@ -237,10 +222,10 @@ class RekapController extends Controller
         $total_keseluruhan = $total_setor - $total_tarik;
 
         // Retrieve data without 'tanggal' column filtering
-        $rekap = Rekap::with(['setor_tabungan', 'tarik_tabungan'])
+        $rekap = Rekap::with(['Setor_tabungan', 'Tarik_tabungan'])
             ->whereBetween('created_at', [$tglawal, $tglakhir])
             ->get();
-
+        dd($request->rekap);
         // Buat objek Dompdf
         $dompdf = new Dompdf();
 

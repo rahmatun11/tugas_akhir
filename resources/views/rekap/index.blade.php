@@ -1,6 +1,7 @@
 @php
     use App\Models\Setor_tabungan;
     use App\Models\Tarik_tabungan;
+    use Carbon\Carbon;
 @endphp
 
 @extends('layouts.admin')
@@ -24,7 +25,7 @@
                                 </span>
                                 <h6 class="mt-3 text-light">
                                     @forelse (empty(session('data')) ? $siswa : session('data')['rekap'] as $item)
-                                        @php
+                                        {{-- @php
                                             $setorrr = Setor_tabungan::where('nisn', $item->nisn);
                                             $tarikkk = Tarik_tabungan::where('nisn', $item->nisn);
                                             
@@ -39,12 +40,10 @@
                                             $totalHasil = abs($setorrr - $tarikkk);
                                         @endphp
 
-                                        Setor : {{ 'Rp ' . number_format($setorrr, 0, ',', '.') }}
+                                        
                                         <br>
-                                        Tarik : {{ 'Rp ' . number_format($tarikkk, 0, ',', '.') }}
-                                        <br>
-                                        <hr>
-                                        Total : {{ 'Rp ' . number_format($totalHasil, 0, ',', '.') }}
+                                        <hr> --}}
+                                        {{-- Total : {{ 'Rp ' . number_format($totalHasil, 0, ',', '.') }} --}}
 
                                     @empty
                                         @if (empty(session('data')))
@@ -53,6 +52,40 @@
                                             gada
                                         @endif
                                     @endforelse
+                                        
+                                    @if (empty(session("data")["total_setor"]))
+                                            Setor : {{ 'Rp. ' . number_format($total_setor, 0, ',', '.') }}
+                                    @else
+                                        @if (session("data")["total_setor"] == 0)
+                                            0
+                                        @else
+                                        Setor : {{ 'Rp. ' . number_format(session("data")["total_setor"], 0, ',', '.') }}
+                                        @endif
+                                    @endif
+                                    
+                                    <br>
+
+                                    @if (empty(session("data")["total_tarik"]))
+                                            Tarik : {{ 'Rp. ' . number_format($total_tarik, 0, ',', '.') }}
+                                    @else
+                                        @if (session("data")["total_tarik"] == 0)
+                                            0
+                                        @else
+                                        Tarik : {{ 'Rp. ' . number_format(session("data")["total_tarik"], 0, ',', '.') }}
+                                        @endif
+                                    @endif
+                                    
+                                    <hr>
+                                    @if (empty(session("data")["total_keseluruhan"]))
+                                            Total : {{ 'Rp. ' . number_format($total_keseluruhan, 0, ',', '.') }}
+                                    @else
+                                        @if (session("data")["total_keseluruhan"] == 0)
+                                            0
+                                        @else
+                                        Total : {{ 'Rp. ' . number_format(session("data")["total_keseluruhan"], 0, ',', '.') }}
+                                        @endif
+                                    @endif
+                                    
                                 </h6>
                             </div>
                         </div>
@@ -150,7 +183,7 @@
                 <div class="col-12">
                     <div class="card m-b-30 mt-3">
                         <div class="card-body">
-                            <form method="POST" action="{{ url('/data-rekap/filter') }}">
+                            <form method="POST" action="{{ url('/rekap_pertanggal') }}">
                                 @csrf
                                 <div class="form-group row">
                                     <label for="example-date-input" class="col-sm-2 col-form-label">Tanggal Awal</label>
@@ -174,6 +207,7 @@
                                             <th>Nama Siswa</th>
                                             <th>Kelas</th>
                                             <th>Saldo Akhir</th>
+                                            <th>Tanggal</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -204,6 +238,9 @@
                                                                 readonly>
                                                             <br>
                                                         </div>
+                                                    </td>
+                                                    <td>
+                                                    {{ Carbon::parse($item->created_at)->locale('id')->isoFormat('dddd, D MMMM YYYY HH:mm:ss') }}
                                                     </td>
                                                     <td>
                                                         <a href="{{ url('rekap/show/' . $item->nisn) }}"
@@ -241,10 +278,13 @@
                                                             <input type="text" class="form-control saldo-tabungan"
                                                                 value="{{ 'Rp ' . number_format($hasil, 0, ',', '.') }}"
                                                                 readonly>
-                                                            <br>
-                                                        </div>
-                                                    </td>
-                                                    <td>
+                                                                <br>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                        {{ Carbon::parse($item->created_at)->locale('id')->isoFormat('dddd, D MMMM YYYY HH:mm:ss') }}
+                                                        </td>
+                                                        <td>
                                                         <a href="{{ url('rekap/show/' . $item->nisn) }}"
                                                             class="btn btn-warning">
                                                             Lihat

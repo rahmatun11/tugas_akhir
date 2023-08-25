@@ -1,3 +1,8 @@
+@php
+    use App\Models\Setor_tabungan;
+    use App\Models\Tarik_tabungan;
+@endphp
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -69,28 +74,30 @@
             Jl. Sempurna No.32 RT/RW.04/02 Desa Sindang-Indramayu-Jawa Barat (45224)
         </div>
     </div>
-    <div>
-        @foreach ($data['rekap'] as $item)
-            <p class="mb-0">
-                Nama: {{$item->siswa->nama}} <br>
-                Nisn: {{$item->siswa->nisn}} <br>
-                Alamat: {{$item->siswa->alamat}} <br>
-                Nomor Hp : {{$item->siswa->no_telp}} <br>
-                Kelas: {{$item->kelas->nama_kelas}}
-            </p>
-        @endforeach
-    </div>
     <table>
         <thead>
             <tr>
                 <th>No</th>
-                <th>Nominal</th>
-                <th>Keterangan</th>
-                <th>Tanggal</th>
+                <th>Nama</th>
+                <th>Kelas</th>
+                <th>Nomor Hp</th>
+                <th>Saldo Akhir</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($data['rekap'] as $item)
+
+                @php
+                    $setor = Setor_tabungan::where('id_kelas', $data["selectedKelasId"])
+                        ->where('nisn', $item->nisn)
+                        ->sum('setor');
+                    
+                    $tarik = Tarik_tabungan::where('id_kelas', $data["selectedKelasId"])
+                        ->where('nisn', $item->nisn)
+                        ->sum('tarik');
+                    
+                    $hasil = abs($setor - $tarik);
+                @endphp
                 <tr>
                     <td>{{ $loop->iteration }}.</td>
                     <td>
@@ -99,7 +106,12 @@
                     <td>
                         {{ $item->kelas->nama_kelas }}
                     </td>
-                    <td></td>
+                    <td>
+                        {{ $item->siswa->no_telp }}
+                    </td>
+                    <td>
+                        {{ 'Rp. ' . number_format($hasil, 0, ',', '.') }}
+                    </td>
                 </tr>
             @endforeach
         </tbody>
@@ -109,7 +121,7 @@
     <br>
     Total Setor: {{ 'Rp ' . number_format($data['total_setor'], 0, ',', '.') }}
     <br>
-    Saldo Akhir: {{'Rp' . number_format($data['total_keseluruhan'], 0, ',', '.')}}
+    Saldo Akhir: {{ 'Rp' . number_format($data['total_keseluruhan'], 0, ',', '.') }}
 </body>
 
 </html>

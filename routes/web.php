@@ -108,12 +108,13 @@ Route::get('transaction/{id}/bayar', [PembayaranController::class, 'bayar'])->na
 Route::get('midtrans/callback', [PembayaranController::class, 'callback'])->name('midtrans.callback');
 
 //route rekap tabungan
+Route::post('rekap_pertanggal', [RekapController::class, 'rekap_pertanggal']);
 Route::post('/data-rekap/filter', [RekapController::class, 'filter'])->name('data-rekap.filter');
 Route::resource('/data-rekap', RekapController::class);
-Route::get('/rekap/show/{id}', [RekapController::class,'show'])->name('rekap.show');
+Route::get('/rekap/show/{id}', [RekapController::class, 'show'])->name('rekap.show');
 Route::get('cetakpdfrekap', [RekapController::class, 'cetak_pdf'])->name('cetakpdf');
 Route::post('/rekap_kelas', [RekapController::class, 'filter_kelas']);
-Route::get('/rekap/generate-pdf', [RekapController::class,'generatePDF'])->name('rekap.generatePDF');
+Route::get('/rekap/generate-pdf', [RekapController::class, 'generatePDF'])->name('rekap.generatePDF');
 
 // Route::post('cetakpdfkelas', [RekapController::class, 'downloadPdfPerKelas'])->name('cetakpdfkelas');
 // Route::get('cetakpdfkelas', [RekapController::class, 'downloadPdfPerKelas'])->name('cetakpdfkelas');
@@ -129,5 +130,3 @@ Route::resource('/rekapitulasi', RekapitulasiController::class);
 Route::get('/rekapitulasi/show', 'RekapitulasiController@show')->name('rekapitulasi.show');
 Route::get('cetakpdfrekapitulasi', [RekapitulasiController::class, 'cetak_pdf'])->name('cetakpdf');
 Route::post('/cetak-data-pertanggalrekapitulasi', [RekapitulasiController::class, 'cetak_pertanggalrekap'])->name('cetak-pertanggal-rekapitulasi');
-
-
