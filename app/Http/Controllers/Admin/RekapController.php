@@ -15,6 +15,7 @@ use App\Models\Tarik_tabungan;
 use App\Http\Controllers\Controller;
 use App\Models\Siswa;
 use App\Models\Siswa_tahun;
+use Illuminate\Support\Facades\DB;
 use illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\View;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -196,51 +197,45 @@ class RekapController extends Controller
 
     public function cetak_pertanggalrekap(Request $request)
     {
-        // Get the input from the form
-        $tglawal = $request->input('tglawal');
-        $tglakhir = $request->input('tglakhir');
+        $messages = [
+            "required" => "Kolom :attribute Harus Diisi"    
+        ];
 
-        // Total pemasukan sebelum tanggal awal
-        $total_setorSebelum = Setor_tabungan::where('created_at', '<', $tglawal)
-            ->sum('setor');
+        $this->validate($request, [
+            "tglawal" => "required",
+            "tglakhir" => "required"
+        ], $messages);
 
-        // Total pemasukan dalam rentang tanggal yang diberikan
-        $total_setor = Setor_tabungan::whereBetween('created_at', [$tglawal, $tglakhir])
-            ->sum('setor');
+        return DB::transaction(function() use ($request) {
+            $tanggal_awal = $request->tglawal;
+            $tanggal_akhir = $request->tglakhir;
 
-        $setor = Setor_tabungan::whereBetween('created_at', [$tglawal, $tglakhir])->get();
+            if ($tanggal_akhir < $tanggal_awal) {
+                alert()->error('Error', 'Tanggal Akhir Harus Lebih Besar');
+                return back()->withInput();
+            }
 
-        $total_tarikSebelum = Tarik_tabungan::where('created_at', '<', $tglawal)
-            ->sum('tarik');
+            $rekap = Rekap::whereBetween("created_at", [$tanggal_awal, $tanggal_akhir])
+                ->get();
 
-        // Total pemasukan dalam rentang tanggal yang diberikan
-        $total_tarik = Tarik_tabungan::whereBetween('created_at', [$tglawal, $tglakhir])
-            ->sum('tarik');
+            $uniqueSiswa = [];
+            $filter = [];
 
-        $tarik = Tarik_tabungan::whereBetween('created_at', [$tglawal, $tglakhir])->get();
+            foreach ($rekap as $item) {
+                if ($item->nisn && !in_array($item->nisn, $uniqueSiswa)) {
+                    $uniqueSiswa[] = $item->nisn;
+                    $filter[] = $item;
+                }
+            }
 
-        $total_keseluruhan = $total_setor - $total_tarik;
+            $data = [
+                "selectedKelasId" => null,
+                "rekap_data" => $filter,
+                "tanggal_awal" => $tanggal_awal,
+                "tanggal_akhir" => $tanggal_akhir
+            ];
 
-        // Retrieve data without 'tanggal' column filtering
-        $rekap = Rekap::with(['Setor_tabungan', 'Tarik_tabungan'])
-            ->whereBetween('created_at', [$tglawal, $tglakhir])
-            ->get();
-        dd($request->rekap);
-        // Buat objek Dompdf
-        $dompdf = new Dompdf();
-
-        // Load view PDF dan berikan data yang diperlukan
-        $html = view('rekap.cetakpdf', compact('setor', 'tarik', 'total_setor', 'total_tarik', 'total_keseluruhan', 'tglawal', 'tglakhir', 'rekap'));
-
-        // Konversi view HTML menjadi PDF
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
-
-        // Generate nama file PDF
-        $filename = 'laporan_tabungan_pertanggal' . '.pdf';
-
-        // Mengirimkan hasil PDF sebagai respons file download
-        return $dompdf->stream($filename);
+            return back()->with(["data" => $data])->withInput();
+        });
     }
 }

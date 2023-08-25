@@ -24,34 +24,6 @@
                                     Rekap Tabungan Siswa
                                 </span>
                                 <h6 class="mt-3 text-light">
-                                    @forelse (empty(session('data')) ? $siswa : session('data')['rekap'] as $item)
-                                        {{-- @php
-                                            $setorrr = Setor_tabungan::where('nisn', $item->nisn);
-                                            $tarikkk = Tarik_tabungan::where('nisn', $item->nisn);
-                                            
-                                            if (!empty(session('data'))) {
-                                                $setorrr->where('id_kelas', session('data')['selectedKelasId']);
-                                                $tarikkk->where('id_kelas', session('data')['selectedKelasId']);
-                                            }
-                                            
-                                            $setorrr = $setorrr->sum('setor');
-                                            $tarikkk = $tarikkk->sum('tarik');
-                                            
-                                            $totalHasil = abs($setorrr - $tarikkk);
-                                        @endphp
-
-                                        
-                                        <br>
-                                        <hr> --}}
-                                        {{-- Total : {{ 'Rp ' . number_format($totalHasil, 0, ',', '.') }} --}}
-
-                                    @empty
-                                        @if (empty(session('data')))
-                                            gada
-                                        @else
-                                            gada
-                                        @endif
-                                    @endforelse
                                         
                                     @if (empty(session("data")["total_setor"]))
                                             Setor : {{ 'Rp. ' . number_format($total_setor, 0, ',', '.') }}
@@ -104,16 +76,26 @@
                                 <!-- Form for date input -->
                                 <form action="{{ route('cetak-pertanggal-rekap') }}" method="POST">
                                     @csrf
-                                    <div class="form-group row">
+                                    <div class="form-group row mb-3">
                                         <label for="tglawal" class="col-sm-2 col-form-label">Tanggal Awal</label>
                                         <div class="col-sm-10">
-                                            <input class="form-control" type="date" name="tglawal" id="tglawal">
+                                            <input class="form-control @error("tglawal") {{ 'is-invalid' }} @enderror" type="date" name="tglawal" id="tglawal" value="{{ old('tglawal') }}">
+                                            @error("tglawal")
+                                                <span class="text-danger">
+                                                    {{ $message }}
+                                                </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="tglakhir" class="col-sm-2 col-form-label">Tanggal Akhir</label>
                                         <div class="col-sm-10">
-                                            <input class="form-control" type="date" name="tglakhir" id="tglakhir">
+                                            <input class="form-control @error("tglakhir") {{ 'is-invalid' }} @enderror" type="date" name="tglakhir" id="tglakhir" value="{{ old('tglakhir') }}">
+                                            @error("tglakhir")
+                                                <span class="text-danger">
+                                                    {{ $message }}
+                                                </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="d-flex flex-wrap justify-content-between" mb-2>
@@ -253,20 +235,18 @@
                                                 <td colspan="5" class="text-center fw-bolder">Data Kosong</td>
                                             @endforelse
                                         @else
-                                            @forelse (session("data")["rekap"] as $item)
+                                            @if (!empty(session("data")["rekap"]))
+                                            @forelse (session('data')["rekap"] as $item)
                                                 @php
-                                                    $setor = Setor_tabungan::where('id_kelas', session('data')['selectedKelasId'])
-                                                        ->where('nisn', $item->nisn)
-                                                        ->sum('setor');
+                                                    $setor = Setor_tabungan::where('nisn', $item->nisn)->sum('setor');
                                                     
-                                                    $tarik = Tarik_tabungan::where('id_kelas', session('data')['selectedKelasId'])
-                                                        ->where('nisn', $item->nisn)
-                                                        ->sum('tarik');
+                                                    $tarik = Tarik_tabungan::where('nisn', $item->nisn)->sum('tarik');
                                                     
-                                                    $hasil = abs($setor - $tarik);
+                                                    $totalHasil = abs($setor - $tarik);
                                                 @endphp
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
+
                                                     <td>
                                                         {{ $item->siswa->nama }}
                                                     </td>
@@ -276,15 +256,15 @@
                                                     <td>
                                                         <div class="form-group">
                                                             <input type="text" class="form-control saldo-tabungan"
-                                                                value="{{ 'Rp ' . number_format($hasil, 0, ',', '.') }}"
+                                                                value="{{ 'Rp ' . number_format($totalHasil, 0, ',', '.') }}"
                                                                 readonly>
-                                                                <br>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                        {{ Carbon::parse($item->created_at)->locale('id')->isoFormat('dddd, D MMMM YYYY HH:mm:ss') }}
-                                                        </td>
-                                                        <td>
+                                                            <br>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                    {{ Carbon::parse($item->created_at)->locale('id')->isoFormat('dddd, D MMMM YYYY HH:mm:ss') }}
+                                                    </td>
+                                                    <td>
                                                         <a href="{{ url('rekap/show/' . $item->nisn) }}"
                                                             class="btn btn-warning">
                                                             Lihat
@@ -292,14 +272,50 @@
                                                     </td>
                                                 </tr>
                                             @empty
+                                                <td colspan="5" class="text-center fw-bolder">Data Kosong</td>
+                                            @endforelse
+                                            @elseif(!empty(session("data")["rekap_data"]))
+                                                @forelse (session("data")["rekap_data"] as $item)
+                                                    @php
+                                                        $setor = Setor_tabungan::where('nisn', $item->nisn)->sum('setor');
+                                                        
+                                                        $tarik = Tarik_tabungan::where('nisn', $item->nisn)->sum('tarik');
+                                                        
+                                                        $totalHasil = abs($setor - $tarik);
+                                                    @endphp
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}.</td>
+                                                        <td>{{ $item->siswa->nama }}</td>
+                                                        <td>{{ $item->Setor_tabungan->kelas->nama_kelas }}</td>
+                                                        <td>
+                                                            <input type="text" class="form-control" value="Rp. {{ number_format($totalHasil) }}" readonly>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            {{ Carbon::parse(session("data")["tanggal_awal"])->locale('id')->isoFormat('dddd, D MMMM YYYY HH:mm:ss') }}
+                                                            <br>
+                                                            <strong>
+                                                                S / D
+                                                            </strong>
+                                                            <br>
+                                                            {{ Carbon::parse(session("data")["tanggal_akhir"])->locale('id')->isoFormat('dddd, D MMMM YYYY HH:mm:ss') }}
+                                                        </td>
+                                                        <td>
+                                                            <a href="{{ url('rekap/show/' . $item->nisn) }}"
+                                                                class="btn btn-warning">
+                                                                Lihat
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                @empty
                                                 <tr>
-                                                    <td colspan="5" class="text-center">
+                                                    <td class="text-center" colspan="6">
                                                         <strong>
-                                                            Data Kosong
+                                                            Data Tidak Ditemukan
                                                         </strong>
                                                     </td>
                                                 </tr>
-                                            @endforelse
+                                                @endforelse
+                                            @endif
                                         @endif
                                     </tbody>
                                 </table>
