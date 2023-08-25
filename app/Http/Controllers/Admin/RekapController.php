@@ -172,18 +172,18 @@ class RekapController extends Controller
             "selectedKelasId" => $kelas
         ];
 
-        return view('rekap.cetakpdf', ["data" => $data]);
+        // return view('rekap.cetakpdf', ["data" => $data]);
 
-        // $dompdf = new Dompdf();
-        // $html = view('rekap.cetakpdf', ["data" => $data]);
+        $dompdf = new Dompdf();
+        $html = view('rekap.cetakpdf', ["data" => $data]);
 
-        // $dompdf->loadHtml($html);
-        // $dompdf->setPaper('A4', 'portrait');
-        // $dompdf->render();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
 
-        // $filename = 'laporan_kelas' . '.pdf';
+        $filename = 'laporan_kelas' . '.pdf';
 
-        // return $dompdf->stream($filename);
+        return $dompdf->stream($filename);
     }
 
 
